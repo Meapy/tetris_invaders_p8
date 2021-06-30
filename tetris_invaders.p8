@@ -3,13 +3,35 @@ version 32
 __lua__
 
 function _init()
-
+	c_r = { 1, 1, 0, -1, 1, 1, -1, -1, 0, 1, -1, 1 } -- x, y, flip - clockwise from nw
 	shots_setup()
 
 	make_turret()
 
 	make_enemies()
 
+	new_game()
+
+end
+
+function new_game()
+	-- clear blocks
+	for y = 5, 18 do
+		for x = 1, 9 do
+			mset( x, y, mget( 16, 5 ))
+		end
+	end
+	m_x = 2
+	m_y = 5
+	m_t = 0
+	m_level = 0
+	m_gameover = false
+	m_pause = false
+	m_nxt_block = flr( rnd( 7 ))
+	m_block = flr( rnd( 7 ))
+	m_block_spd = 16
+	m_rotate = 0 -- rotate clockwise 0-3 ( 1 = no rotation )
+	m_score = 0
 end
 
 function _update()
@@ -31,7 +53,7 @@ end
 function _draw()
 
  cls()
-
+ map( 0, 4, 0, 0, 128, 128 )
  --loop through all the shots
  --and pass each shot to the
  --draw_shot() function
@@ -41,6 +63,16 @@ function _draw()
  --enemies that are left
  draw_turret()
  foreach(enemies,draw_enemy)
+
+ -- next block
+ map( m_nxt_block * 4, 0, 88, 8, 4, 4 )
+ -- score
+ color( 12 )
+ cursor( 102, 86 )
+ print( m_level )
+ cursor( 104 - #sub( m_score, 0 ) * 2, 110 ) -- idk how to convert to string explicitly
+ print( m_score )
+ draw_block()
 
 end
 -->8
@@ -187,10 +219,20 @@ end
 
 --make a simple turret table
 function make_turret()
-	turret={}
-	turret.x=60
-	turret.y=88
-	turret.sprite=13
+	player={
+					x=60,
+					y=88,
+					dx=0,
+					dy=0,
+					max_dx=2,
+					max_dy=3,
+					acc=0.5,
+					boost=4,
+					sprite=13,
+	}
+
+	gravity=0.3
+ friction=0.85
 end
 
 --move the turret if they press
@@ -200,23 +242,42 @@ end
 function update_turret()
 
  --move the turret
- if (btn(⬅️)) turret.x-=1
- if (btn(➡️)) turret.x+=1
+  player.dy+=gravity
+    player.dx*=friction
 
- --keep it on screen
- turret.x=mid(0,turret.x,120)
+    --controls
+    if (btn(0)) then player.dx-=player.acc end -- left
+    if (btn(1)) then player.dx+=player.acc end -- right
+    if (btnp(⬆️)) then player.dy-=player.boost end -- x
 
+    --limit left/right speed
+    player.dx=mid(-player.max_dx,player.dx,player.max_dx)
+    --limit fall speed
+    if (player.dy>0) then
+        player.dy=mid(-player.max_dy,player.dy,player.max_dy)
+    end
+
+    --apply dx and dy to player position
+    player.x+=player.dx
+    player.y+=player.dy
+
+    --simple ground collision
+    if (player.y>110) then player.y=110 player.dy=0 end
+
+    --if run off screen warp to other side
+    if (player.x>128) then player.x=-8 end
+    if (player.x<-8) then player.x=128 end
  --create a projectile if they
  --press the ❎ button
  if (btnp(❎)) then
-  make_shot(turret.x+2,turret.y)
+  make_shot(player.x+2,player.y)
  end
 
 end
 
 --draw the turret on the screen
 function draw_turret()
-	spr(turret.sprite,turret.x,turret.y)
+	spr(player.sprite,player.x,player.y)
 end
 
 --create a few simple enemies
