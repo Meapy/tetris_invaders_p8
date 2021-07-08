@@ -44,12 +44,7 @@ function _update()
 		m_t += 1
 		m_block_spd = max( 4, 16 - m_level )
 		-- input
-		if( btn( 3 )) m_block_spd = 2
-		if( btnp( 5 ) and not block_collision( m_x, m_y, ( m_rotate + 1 ) % 4 )) m_rotate = ( m_rotate + 1 ) % 4
-		if( btnp( 0 ) or btnp( 1 )) then
-			if( btn( 0 ) and not block_collision( m_x - 1, m_y, m_rotate )) m_x -= 1
-			if( btn( 1 ) and not block_collision( m_x + 1, m_y, m_rotate )) m_x += 1
-		end
+	
 		-- move down
 		if( m_t % m_block_spd == 0 ) gravity()
 		-- check row remove
@@ -278,20 +273,6 @@ end
 
 
 __gfx__
-cc11111caa99999abb33333b88eeeee822ddddd299aaaaa911ccccc1
-ccccccccaaaaaaaabbbbbbbb88888888222222229999999911111111
-1c77cccc9a77aaaa3b77bbbbe8778888d2772222a9779999c1771111
-1c77cccc9a77aaaa3b77bbbbe8778888d2772222a9779999c1771111
-1ccccccc9aaaaaaa3bbbbbbbe8888888d2222222a9999999c1111111
-1ccccccc9aaaaaaa3bbbbbbbe8888888d2222222a9999999c1111111
-1ccccc1c9aaaaa9a3bbbbb3be88888e8d22222d2a99999a9c11111c1
-ccccccccaaaaaaaabbbbbbbb88888888222222229999999911111111
-
-
-
-
-
-
 00000000000000007777777777777777cc11111caa99999abb33333b88eeeee822ddddd299aaaaa911ccccc17777777777777777777777777777777777777777
 0000000000000000c767c76776677667ccccccccaaaaaaaabbbbbbbb88888888222222229999999911111111788888899999aaaaaabbbb77c222227777777777
 000000000000000077777777767777671c77cccc9a77aaaa3b77bbbbe8778888d2772222a9779999c1771111788888899777aaaaaabb77b77277727777777777
