@@ -8,8 +8,6 @@ function _init()
 
 	make_turret()
 
-	--make_enemies()
-
 	new_game()
 
 end
@@ -252,11 +250,14 @@ function make_turret()
 					acc=0.5,
 					boost=4,
 					sprite=13,
+					w = 0.4,
+ 					h = 0.4,
 	}
 
 	gravity=0.3
  friction=0.85
 end
+
 
 --move the turret if they press
 --⬅️/➡️, but don't let it leave
@@ -265,7 +266,7 @@ end
 function update_turret()
 
  --move the turret
-  player.dy+=gravity
+  	player.dy+=gravity
     player.dx*=friction
 
     --controls
@@ -273,28 +274,24 @@ function update_turret()
     if (btn(1,1)) then player.dx+=player.acc end -- right
     if (btnp(2,1)) then player.dy-=player.boost end -- x
 
+
     --limit left/right speed
-    player.dx=mid(-player.max_dx,player.dx,player.max_dx)
+		player.dx=mid(-player.max_dx,player.dx,player.max_dx)
     --limit fall speed
     if (player.dy>0) then
         player.dy=mid(-player.max_dy,player.dy,player.max_dy)
     end
 
     --apply dx and dy to player position
-    player.x+=player.dx
-    player.y+=player.dy
-
+	if(can_move(player.dx,player.dy))then
+		player.x+=player.dx
+	    player.y+=player.dy
+	end
+	print("x "..player.x,0,120,7)
+	print("y "..player.y,64,120,7)
     --simple ground collision
     if (player.y>110) then player.y=110 player.dy=0 end
 
-    --if run off screen warp to other side
-    if (player.x>128) then player.x=-8 end
-    if (player.x<-8) then player.x=128 end
- --create a projectile if they
- --press the ❎ button
- if (btnp(❎)) then
-  make_shot(player.x+2,player.y)
- end
 
 end
 
@@ -314,25 +311,18 @@ function make_enemies()
 
 end
 
---create a very simple enemy
---that just has a hitbox
---(x,y,w,h) and add it to the
---list of enemies
-function make_enemy(x,y)
-	local e={}
-	e.x=x
-	e.y=y
-	e.w=7
-	e.h=7
-	e.sprite=5
-	add(enemies,e)
+function is_tile(tile_type,x,y)
+	tile=mget(x,y)
+	has_flag=fget(tile,tyle_type)
+	return has_flag
 end
 
---draw an enemy on the screen
-function draw_enemy(e)
-	spr(e.sprite,e.x,e.y)
+function can_move(x,y)
+	return not is_tile(0,x,y)
 end
--->8
+
+
+
 --collision functions
 
 --this is a standard overlap
@@ -342,7 +332,7 @@ end
 --overlap.p8.png for how this
 --works
 function overlap(a,b)
-	return not (a.x>b.x+b.w or a.y>b.y+b.h or a.x+a.w<b.x or a.y+a.h<b.y)
+	return not (player.x>b.x+b.w or player.y>b.y+b.h or player.x+player.w<b.x or player.y+player.h<b.y)
 end
 -->8
 --tetris code
@@ -482,8 +472,8 @@ function draw_ghost()
 end
 
 __gfx__
-0000000000000000effffff71111111122222222111111119999999933333333eeeeeeeeddddddddaaaaaaaacccccccc00000000008886660880000000000000
-00000000000000002effff7f16611661288888821cccccc19aaaaaa93bbbbbb3e888888ed222222da999999ac111111c00000000067777668278000000000000
+0000000000000000effffff71111111122222222111111119999999933333333eeeeeeeeddddddddaaaaaaaacccccccc00000000000000000880000000000000
+00000000000000002effff7f16611661288888821cccccc19aaaaaa93bbbbbb3e888888ed222222da999999ac111111c00000000067777608278000000000000
 000000000000000022eeeeff16111161282222821c1111c19a9999a93b3333b3e8eeee8ed2dddd2da9aaaa9ac1cccc1c00700700655667608228000000000000
 000000000000000022eeeeff11111111282882821c1cc1c19a9aa9a93b3bb3b3e8e88e8ed2d22d2da9a99a9ac1c11c1c000770000fbbfbb00880000000000000
 000000000000000022eeeeff11111111282882821c1cc1c19a9aa9a93b3bb3b3e8e88e8ed2d22d2da9a99a9ac1c11c1c000770000fffff000000000000000000
@@ -621,7 +611,7 @@ __label__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
 __gff__
-0000010001010101010101010001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000010001010101010101010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 00040000000000000000000000000000404142434409464748490a4b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
